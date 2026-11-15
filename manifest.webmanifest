@@ -3,8 +3,12 @@
   "short_name": "ATHLETE",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#101923",
-  "theme_color": "#101923",
+  "background_color": "#101417",
+  "theme_color": "#101417",
   "lang": "da",
-  "description": "Personlig træningslog til styrke, cykling, kost og vægt."
+  "description": "Personlig træningslog til styrke, cykling, kost og vægt.",
+  "icons": [
+    {"src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"}
+  ]
 }

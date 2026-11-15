@@ -6,6 +6,9 @@ function save(){localStorage.setItem(KEY,JSON.stringify(db));render()}
 function today(){return new Date().toISOString().slice(0,10)}
 document.querySelectorAll('input[type="date"]').forEach(x=>x.value=today());
 document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.tab,.page').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.getElementById(b.dataset.page).classList.add('active');window.scrollTo(0,0)}));
+function openPage(page){document.querySelectorAll('.tab,.page').forEach(x=>x.classList.remove('active'));document.querySelector(`.tab[data-page="${page}"]`)?.classList.add('active');document.getElementById(page)?.classList.add('active');window.scrollTo(0,0)}
+document.querySelectorAll('[data-open]').forEach(b=>b.addEventListener('click',()=>{if(b.dataset.weekday){const day=document.querySelector('#strengthForm [name="day"]');if(day)day.value=b.dataset.weekday;}openPage(b.dataset.open)}));
+document.querySelectorAll('[data-rest]').forEach(b=>b.addEventListener('click',()=>alert('Søndag er din restitutionsdag. Husk rolig bevægelse og restitution.')));
 function formData(form){return Object.fromEntries(new FormData(form).entries())}
 function add(form,key){form.addEventListener('submit',e=>{e.preventDefault();let d=formData(form);d.id=crypto.randomUUID();db[key].unshift(d);form.reset();form.querySelector('[name=date]').value=today();save();})}
 add(document.getElementById('strengthForm'),'strength');add(document.getElementById('cyclingForm'),'cycling');add(document.getElementById('nutritionForm'),'nutrition');add(document.getElementById('weightForm'),'weight');
@@ -20,6 +23,44 @@ function render(){
  document.getElementById('homeRides').textContent=db.cycling.length;
  document.getElementById('homeKm').textContent=db.cycling.reduce((a,x)=>a+(Number(x.km)||0),0).toFixed(1);
  const cycle=Number(db.strength[0]?.cycle||1),sets={1:2,2:3,3:4,4:2}[cycle];document.getElementById('cycleText').textContent=`Styrkecyklus · uge ${cycle} af 4 · ${sets} sæt`;
+ // Dashboard cards: current day, weekly strip, cycle, weight, cycling and PRs.
+ const schedule=[
+  {short:'Ma',name:'Bryst + triceps',kind:'strength',icon:'🏋️'},
+  {short:'Ti',name:'Ryg + biceps',kind:'strength',icon:'🏋️'},
+  {short:'On',name:'Cykling',kind:'cycling',icon:'🚴'},
+  {short:'To',name:'Skulder + mave',kind:'strength',icon:'🏋️'},
+  {short:'Fr',name:'Ben',kind:'strength',icon:'🏋️'},
+  {short:'Lø',name:'Cykling',kind:'cycling',icon:'🚴'},
+  {short:'Sø',name:'Hvile',kind:'rest',icon:'—'}
+ ];
+ const now=new Date(),monday=new Date(now);monday.setHours(0,0,0,0);monday.setDate(monday.getDate()-((monday.getDay()+6)%7));
+ const dateKey=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+ const weekDates=Array.from({length:7},(_,i)=>{const d=new Date(monday);d.setDate(monday.getDate()+i);return dateKey(d)});
+ const todayIndex=(now.getDay()+6)%7;
+ const todayPlan=schedule[todayIndex];
+ const title=document.getElementById('todayTitle'),subtitle=document.getElementById('todaySubtitle'),todayIcon=document.getElementById('todayIcon');
+ if(title){title.textContent=todayPlan.kind==='rest'?'HVILE / RESTITUTION':todayPlan.name.toUpperCase();subtitle.textContent=todayPlan.kind==='rest'?'Restitution: søvn, gåture og mobilitet. Ingen planlagt træning.':todayPlan.kind==='cycling'?'Dagens cykelpas – registrér watt, puls og distance.':'Dagens styrkepas – log øvelser, sæt og gentagelser.';todayIcon.textContent=todayPlan.icon;}
+ const weekStrength=db.strength.filter(x=>weekDates.includes(x.date));
+ const weekCycling=db.cycling.filter(x=>weekDates.includes(x.date));
+ const completedDates=new Set([...weekStrength,...weekCycling].map(x=>x.date));
+ const strip=document.getElementById('weekStrip');
+ if(strip){strip.querySelectorAll('button').forEach((b,i)=>{b.classList.toggle('today',i===todayIndex);b.classList.toggle('done',completedDates.has(weekDates[i]));});}
+ const sessionsDone=new Set([...weekStrength.map(x=>x.date),...weekCycling.map(x=>x.date)]).size;
+ const count=document.getElementById('weekCount');if(count)count.textContent=`${sessionsDone}/6`;
+ const cycleLabel=document.getElementById('cycleWeekLabel');if(cycleLabel)cycleLabel.textContent=`Uge ${cycle}/4`;
+ const cycleGrid=document.getElementById('cycleGrid');if(cycleGrid)cycleGrid.querySelectorAll('.cycle-step').forEach((x,i)=>x.classList.toggle('active',i===cycle-1));
+ const latestWeight=db.weight[0],target=Number(g.target||82),start=Number(g.start||90),current=latestWeight?Number(latestWeight.kg):null;
+ const wn=document.getElementById('weightNow'),wg=document.getElementById('weightGoal'),wl=document.getElementById('weightLeft'),wp=document.getElementById('weightProgress'),wNote=document.getElementById('weightNote');
+ if(wn)wn.textContent=current===null?'–':current.toFixed(1);if(wg)wg.textContent=target.toFixed(0);if(wl)wl.textContent=current===null?'–':Math.max(0,current-target).toFixed(1);
+ if(wp)wp.style.width=current===null?'0%':`${Math.max(0,Math.min(100,((start-current)/(start-target||1))*100))}%`;if(wNote)wNote.textContent=current===null?'Ikke logget':`Senest registreret ${latestWeight.date}`;
+ const latestRide=db.cycling[0],ftp=latestRide?.ftp||270,ftpValue=document.getElementById('ftpValue'),ftpNote=document.getElementById('ftpNote');if(ftpValue)ftpValue.textContent=ftp;if(ftpNote)ftpNote.textContent=latestRide?.ftp?'Senest registreret':'Ubekræftet';
+ const wr=document.getElementById('weekRides'),wm=document.getElementById('weekMinutes'),wk=document.getElementById('weekKm');if(wr)wr.textContent=weekCycling.length;if(wm)wm.textContent=`${weekCycling.reduce((a,x)=>a+(Number(x.minutes)||0),0)} min`;if(wk)wk.textContent=weekCycling.reduce((a,x)=>a+(Number(x.km)||0),0).toFixed(0);
+ const cyclingNote=document.getElementById('cyclingNote');if(cyclingNote)cyclingNote.textContent=weekCycling.length?`${weekCycling.reduce((a,x)=>a+(Number(x.km)||0),0).toFixed(1)} km registreret denne uge.`:'Ingen ture logget endnu.';
+ const bestByExercise={};db.strength.forEach(x=>{const k=(x.exercise||'').toLowerCase();if(!bestByExercise[k]||Number(x.kg)>Number(bestByExercise[k].kg))bestByExercise[k]=x;});
+ const prs=Object.values(bestByExercise).sort((a,b)=>Number(b.kg)-Number(a.kg)).slice(0,3);const prList=document.getElementById('prList');if(prList)prList.innerHTML=prs.length?prs.map(x=>`<div class="pr-item"><strong>${esc(x.exercise)}</strong><span>${esc(x.kg)} kg</span></div>`).join(''):'<p class="muted">Ingen PR’er endnu. Første registrering bliver din baseline.</p>';
+ const volume=weekStrength.reduce((a,x)=>a+(Number(x.kg)||0)*(Number(x.sets)||0)*(Number(x.reps)||0),0),setsThisWeek=weekStrength.reduce((a,x)=>a+(Number(x.sets)||0),0);
+ const analysis=document.getElementById('weekAnalysis');if(analysis)analysis.textContent=`${setsThisWeek} sæt · ${Math.round(volume).toLocaleString('da-DK')} kg volumen · ${weekStrength.length} styrkelogninger denne uge`;
+
  const recent=[...db.strength.slice(0,2).map(x=>({d:x.date,t:`${x.exercise} · ${x.kg} kg × ${x.reps}`,k:'Styrke'})),...db.cycling.slice(0,2).map(x=>({d:x.date,t:`${x.type} · ${x.km||0} km · ${x.watts||0} W`,k:'Cykling'})),...db.weight.slice(0,1).map(x=>({d:x.date,t:`Vægt ${x.kg} kg`,k:'Vægt'}))].sort((a,b)=>b.d.localeCompare(a.d));
  document.getElementById('recent').innerHTML=recent.length?recent.slice(0,4).map(x=>`<div class="record"><strong>${esc(x.t)}</strong><small>${esc(x.d)} · ${x.k}</small></div>`).join(''):'Du har endnu ikke registreret noget. Start med et træningspas.';
  list('strengthList',db.strength,x=>`${x.exercise} · ${x.kg} kg × ${x.reps}`,x=>`${x.date} · ${x.sets} sæt · ${x.day} · uge ${x.cycle}`);

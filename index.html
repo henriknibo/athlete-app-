@@ -8,12 +8,13 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="ATHLETE">
 <link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
 <link rel="stylesheet" href="style.css">
 <title>ATHLETE – Træningsmakker</title>
 </head>
 <body>
 <header class="top">
-  <div><div class="eyebrow">DIN PERSONLIGE TRÆNINGSPARTNER</div><h1>ATHLETE<span>.</span></h1></div>
+  <div class="brand-lockup"><img class="brand-logo" src="athlete-logo.png" alt="ATHLETE-logo"><div><div class="eyebrow">DIN PERSONLIGE TRÆNINGSPARTNER</div><h1>ATHLETE<span>.</span></h1></div></div>
   <button class="icon-btn" id="backupBtn" title="Eksportér backup">⇩</button>
 </header>
 <nav class="tabs" aria-label="Hovedmenu">
@@ -25,47 +26,55 @@
 </nav>
 <main>
 <section id="home" class="page active">
-  <div class="hero">
-    <div class="eyebrow">DIT UGEFOKUS</div>
-    <h2>Stærkere hver uge.<br><span>Ét pas ad gangen.</span></h2>
-    <p>Log din træning og følg udviklingen – dine data gemmes på denne enhed.</p>
-    <div class="cycle" id="cycleText">Styrkecyklus · uge 1 af 4 · 2 sæt</div>
-  </div>
-  <div class="grid stats">
-    <article class="stat"><small>Seneste vægt</small><strong id="homeWeight">–</strong><em>kg</em></article>
-    <article class="stat"><small>Registrerede styrkepas</small><strong id="homeStrength">0</strong><em>pas</em></article>
-    <article class="stat"><small>Cykelture</small><strong id="homeRides">0</strong><em>ture</em></article>
-    <article class="stat"><small>Cykeldistance</small><strong id="homeKm">0</strong><em>km</em></article>
-  </div>
-  <article class="panel">
-    <div class="panel-head"><h3>Din ugeplan</h3><span class="tag">Standardplan</span></div>
-    <div class="week">
-      <div><b>MAN</b><span>Bryst + triceps</span></div><div><b>TIR</b><span>Ryg + biceps</span></div>
-      <div><b>ONS</b><span>Cykling</span></div><div><b>TOR</b><span>Skulder + mave</span></div>
-      <div><b>FRE</b><span>Ben</span></div><div><b>LØR</b><span>Cykling</span></div>
-      <div><b>SØN</b><span>Hvile</span></div>
+  <article class="today-card panel">
+    <div class="today-copy"><div class="eyebrow">I DAG</div><h2 id="todayTitle">STYRKE / TRÆNING</h2><p id="todaySubtitle">Dagens træning – ét pas ad gangen.</p></div>
+    <div class="today-icon" id="todayIcon">🏋️</div>
+  </article>
+
+  <article class="panel week-panel">
+    <div class="panel-head"><h3>UGEN</h3><strong class="week-count" id="weekCount">0/6</strong></div>
+    <div class="week-strip" id="weekStrip">
+      <button type="button" data-weekday="Bryst + triceps" data-open="strength"><small>Ma</small><span>🏋️</span></button>
+      <button type="button" data-weekday="Ryg + biceps" data-open="strength"><small>Ti</small><span>🏋️</span></button>
+      <button type="button" data-open="cycling"><small>On</small><span>🚴</span></button>
+      <button type="button" data-weekday="Skulder + mave" data-open="strength"><small>To</small><span>🏋️</span></button>
+      <button type="button" data-weekday="Ben" data-open="strength"><small>Fr</small><span>🏋️</span></button>
+      <button type="button" data-open="cycling"><small>Lø</small><span>🚴</span></button>
+      <button type="button" data-rest="true"><small>Sø</small><span>—</span></button>
     </div>
+    <div class="cycle-head"><span>4-UGERS STYRKECYKLUS</span><span id="cycleWeekLabel">Uge 1/4</span></div>
+    <div class="cycle-grid" id="cycleGrid"><div class="cycle-step active"><b>2</b><small>SÆT</small></div><div class="cycle-step"><b>3</b><small>SÆT</small></div><div class="cycle-step"><b>4</b><small>SÆT</small></div><div class="cycle-step"><b>2</b><small>SÆT</small></div></div>
   </article>
+
+  <article class="panel metric-panel">
+    <div class="panel-head"><h3>VÆGT</h3><button class="text-link" data-open="weight">›</button></div>
+    <div class="metric-trio"><div><small>NU</small><b id="weightNow">–</b><em>kg</em></div><div><small>MÅL</small><b id="weightGoal">82</b><em>kg</em></div><div><small>TILBAGE</small><b id="weightLeft">8</b><em>kg</em></div></div>
+    <div class="progress-track"><span id="weightProgress"></span></div><small class="muted" id="weightNote">Ikke logget</small>
+  </article>
+
+  <article class="panel metric-panel">
+    <div class="panel-head"><h3>CYKLING</h3><button class="text-link" data-open="cycling">›</button></div>
+    <div class="metric-trio"><div><small>FTP</small><b class="orange" id="ftpValue">270</b><em>W</em><small class="muted" id="ftpNote">Ubekræftet</small></div><div><small>UGE</small><b id="weekRides">0</b><em>ture</em><small class="muted" id="weekMinutes">0 min</small></div><div><small>KM UGE</small><b id="weekKm">0</b><em>km</em></div></div>
+    <small class="muted" id="cyclingNote">Ingen ture logget endnu.</small>
+  </article>
+
+  <article class="panel metric-panel">
+    <div class="panel-head"><h3>SENESTE PR'ER</h3><span class="muted">STYRKE</span></div>
+    <div id="prList" class="pr-list"><p class="muted">Ingen PR'er endnu. Første registrering bliver din baseline.</p></div>
+  </article>
+
+  <article class="panel metric-panel">
+    <div class="panel-head"><h3>Ugeanalyse</h3><span class="analysis-icon">▥</span></div>
+    <div class="analysis-summary" id="weekAnalysis">0 sæt · 0 kg volumen · 0 PR denne uge</div>
+  </article>
+
   <article class="panel">
-    <div class="panel-head"><h3>Seneste registreringer</h3><span class="tag">Live overblik</span></div>
-    <div id="recent" class="muted">Du har endnu ikke registreret noget. Start med et træningspas.</div>
+    <div class="panel-head"><h3>Dine mål</h3><span class="tag">Personligt</span></div>
+    <div class="goal-grid"><label>Startvægt (kg)<input id="goalStart" type="number" value="90"></label><label>Målvægt (kg)<input id="goalTarget" type="number" value="82"></label><label>Kalorier pr. dag<input id="goalCalories" type="number" value="2300"></label><label>Protein pr. dag (g)<input id="goalProtein" type="number" value="180"></label></div>
+    <button class="primary" id="saveGoals">Gem mål</button><p class="hint">Kalorie- og proteinmål er foreløbige forslag og kan ændres.</p>
   </article>
-  <article class="panel">
-    <h3>Dine mål</h3>
-    <div class="goal-grid">
-      <label>Startvægt (kg)<input id="goalStart" type="number" value="90"></label>
-      <label>Målvægt (kg)<input id="goalTarget" type="number" value="82"></label>
-      <label>Kalorier pr. dag<input id="goalCalories" type="number" value="2300"></label>
-      <label>Protein pr. dag (g)<input id="goalProtein" type="number" value="180"></label>
-    </div>
-    <button class="primary" id="saveGoals">Gem mål</button>
-    <p class="hint">Kalorie- og proteinmål er foreløbige forslag og kan ændres. Følg også energi, restitution og træningspræstation.</p>
-  </article>
-  <article class="panel">
-    <h3>Backup og privatliv</h3>
-    <p class="hint">Dine registreringer gemmes lokalt i browseren på denne iPhone. Brug pilen øverst til at eksportere en backup. Slet ikke browserdata, før du har en backup.</p>
-    <label class="file-label">Indlæs backup <input id="importFile" type="file" accept="application/json"></label>
-  </article>
+  <article class="panel"><h3>Seneste registreringer</h3><div id="recent" class="muted">Du har endnu ikke registreret noget. Start med et træningspas.</div></article>
+  <article class="panel"><h3>Backup og privatliv</h3><p class="hint">Dine registreringer gemmes lokalt i browseren på denne enhed. Brug pilen øverst til at eksportere en backup. Slet ikke browserdata, før du har en backup.</p><label class="file-label">Indlæs backup <input id="importFile" type="file" accept="application/json"></label></article>
 </section>
 
 <section id="strength" class="page">
