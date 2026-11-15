@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#101923">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ATHLETE">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="stylesheet" href="style.css">
+<title>ATHLETE – Træningsmakker</title>
+</head>
+<body>
+<header class="top">
+  <div><div class="eyebrow">DIN PERSONLIGE TRÆNINGSPARTNER</div><h1>ATHLETE<span>.</span></h1></div>
+  <button class="icon-btn" id="backupBtn" title="Eksportér backup">⇩</button>
+</header>
+<nav class="tabs" aria-label="Hovedmenu">
+  <button class="tab active" data-page="home">Overblik</button>
+  <button class="tab" data-page="strength">Styrke</button>
+  <button class="tab" data-page="cycling">Cykling</button>
+  <button class="tab" data-page="nutrition">Kost</button>
+  <button class="tab" data-page="weight">Vægt</button>
+</nav>
+<main>
+<section id="home" class="page active">
+  <div class="hero">
+    <div class="eyebrow">DIT UGEFOKUS</div>
+    <h2>Stærkere hver uge.<br><span>Ét pas ad gangen.</span></h2>
+    <p>Log din træning og følg udviklingen – dine data gemmes på denne enhed.</p>
+    <div class="cycle" id="cycleText">Styrkecyklus · uge 1 af 4 · 2 sæt</div>
+  </div>
+  <div class="grid stats">
+    <article class="stat"><small>Seneste vægt</small><strong id="homeWeight">–</strong><em>kg</em></article>
+    <article class="stat"><small>Registrerede styrkepas</small><strong id="homeStrength">0</strong><em>pas</em></article>
+    <article class="stat"><small>Cykelture</small><strong id="homeRides">0</strong><em>ture</em></article>
+    <article class="stat"><small>Cykeldistance</small><strong id="homeKm">0</strong><em>km</em></article>
+  </div>
+  <article class="panel">
+    <div class="panel-head"><h3>Din ugeplan</h3><span class="tag">Standardplan</span></div>
+    <div class="week">
+      <div><b>MAN</b><span>Bryst + triceps</span></div><div><b>TIR</b><span>Ryg + biceps</span></div>
+      <div><b>ONS</b><span>Cykling</span></div><div><b>TOR</b><span>Skulder + mave</span></div>
+      <div><b>FRE</b><span>Ben</span></div><div><b>LØR</b><span>Cykling</span></div>
+      <div><b>SØN</b><span>Hvile</span></div>
+    </div>
+  </article>
+  <article class="panel">
+    <div class="panel-head"><h3>Seneste registreringer</h3><span class="tag">Live overblik</span></div>
+    <div id="recent" class="muted">Du har endnu ikke registreret noget. Start med et træningspas.</div>
+  </article>
+  <article class="panel">
+    <h3>Dine mål</h3>
+    <div class="goal-grid">
+      <label>Startvægt (kg)<input id="goalStart" type="number" value="90"></label>
+      <label>Målvægt (kg)<input id="goalTarget" type="number" value="82"></label>
+      <label>Kalorier pr. dag<input id="goalCalories" type="number" value="2300"></label>
+      <label>Protein pr. dag (g)<input id="goalProtein" type="number" value="180"></label>
+    </div>
+    <button class="primary" id="saveGoals">Gem mål</button>
+    <p class="hint">Kalorie- og proteinmål er foreløbige forslag og kan ændres. Følg også energi, restitution og træningspræstation.</p>
+  </article>
+  <article class="panel">
+    <h3>Backup og privatliv</h3>
+    <p class="hint">Dine registreringer gemmes lokalt i browseren på denne iPhone. Brug pilen øverst til at eksportere en backup. Slet ikke browserdata, før du har en backup.</p>
+    <label class="file-label">Indlæs backup <input id="importFile" type="file" accept="application/json"></label>
+  </article>
+</section>
+
+<section id="strength" class="page">
+  <div class="section-title"><div class="eyebrow">TRÆNINGSLOG</div><h2>Styrketræning</h2><p>Log vægt, sæt og gentagelser. Seneste tal vises som hjælp næste gang.</p></div>
+  <article class="panel">
+    <form id="strengthForm">
+      <label>Dato<input name="date" type="date" required></label>
+      <label>Uge i 4-ugers cyklus<select name="cycle"><option value="1">Uge 1 · 2 sæt</option><option value="2">Uge 2 · 3 sæt</option><option value="3">Uge 3 · 4 sæt</option><option value="4">Uge 4 · 2 sæt</option></select></label>
+      <label>Træningsdag<select name="day"><option>Bryst + triceps</option><option>Ryg + biceps</option><option>Skulder + mave</option><option>Ben</option><option>Andet</option></select></label>
+      <label>Øvelse<input name="exercise" list="exerciseList" placeholder="Fx bænkpres" required></label>
+      <datalist id="exerciseList"><option>Bænkpres</option><option>Incline bænkpres</option><option>Flyes</option><option>Triceps pushdown</option><option>Lat pulldown</option><option>Siddende row</option><option>Barbell row</option><option>Biceps curl</option><option>Hammer curl</option><option>Skulderpres</option><option>Lateral raises</option><option>Squat</option><option>Benpres</option><option>Leg curl</option><option>Leg extension</option><option>Calf raises</option></datalist>
+      <div class="two"><label>Sæt<input name="sets" type="number" min="1" max="10" required></label><label>Vægt (kg)<input name="kg" type="number" min="0" step="0.5" required></label></div>
+      <label>Gentagelser pr. sæt<input name="reps" type="number" min="1" max="100" required></label>
+      <div id="lastLift" class="hint"></div>
+      <label>Noter (valgfrit)<textarea name="notes" rows="2" placeholder="Fx god teknik, tung sidste serie…"></textarea></label>
+      <button class="primary">Gem styrketræning</button>
+    </form>
+  </article>
+  <article class="panel"><h3>Historik</h3><div id="strengthList" class="records"></div></article>
+</section>
+
+<section id="cycling" class="page">
+  <div class="section-title"><div class="eyebrow">WATT · PULS · DISTANCE</div><h2>Cykling</h2><p>Følg dine ture og udviklingen i din cykelform.</p></div>
+  <article class="panel"><form id="cyclingForm">
+    <label>Dato<input name="date" type="date" required></label>
+    <label type="text">Type pas<select name="type"><option>Udholdenhed</option><option>Tempo</option><option>FTP-intervaller</option><option>Restitution</option><option>Andet</option></select></label>
+    <div class="two"><label>Distance (km)<input name="km" type="number" min="0" step="0.1"></label><label>Tid (min)<input name="minutes" type="number" min="0"></label></div>
+    <div class="two"><label>Gns. watt<input name="watts" type="number" min="0"></label><label>Normaliseret watt<input name="np" type="number" min="0"></label></div>
+    <div class="two"><label>Gns. puls<input name="hr" type="number" min="0"></label><label>Max puls<input name="maxhr" type="number" min="0"></label></div>
+    <label>FTP (watt)<input name="ftp" type="number" min="0" placeholder="Indtast aktuel FTP"></label>
+    <label>Noter<textarea name="notes" rows="2"></textarea></label>
+    <button class="primary">Gem cykeltur</button>
+  </form></article>
+  <article class="panel"><h3>Cykelhistorik</h3><div id="cyclingList" class="records"></div></article>
+</section>
+
+<section id="nutrition" class="page">
+  <div class="section-title"><div class="eyebrow">BRÆNDSTOF TIL KROPPEN</div><h2>Kostlog</h2><p>Følg kalorier og makroer. Målene kan ændres på startsiden.</p></div>
+  <article class="panel"><div class="macro-grid"><div><small>Kalorier i dag</small><b id="todayCalories">0</b></div><div><small>Protein i dag</small><b id="todayProtein">0 g</b></div></div><p class="hint" id="nutritionTargets"></p></article>
+  <article class="panel"><form id="nutritionForm">
+    <label>Dato<input name="date" type="date" required></label>
+    <label>Måltid<select name="meal"><option>Morgenmad</option><option>Snack 1</option><option>Frokost</option><option>Snack 2</option><option>Aftensmad</option></select></label>
+    <label>Mad/drikke<input name="food" required placeholder="Fx skyr med bær"></label>
+    <div class="two"><label>Kalorier<input name="calories" type="number" min="0"></label><label>Protein (g)<input name="protein" type="number" min="0" step="0.1"></label></div>
+    <div class="two"><label>Kulhydrat (g)<input name="carbs" type="number" min="0" step="0.1"></label><label>Fedt (g)<input name="fat" type="number" min="0" step="0.1"></label></div>
+    <button class="primary">Gem måltid</button>
+  </form></article>
+  <article class="panel"><h3>Gemt snackidé</h3><p>50 g havregryn · 30 g proteinpulver · 250 ml minimælk 0,5 % · 15 g mandler</p><p class="hint">Indtast næringsindhold fra dine egne produkter – værdierne varierer mellem mærker.</p></article>
+  <article class="panel"><h3>Måltider</h3><div id="nutritionList" class="records"></div></article>
+</section>
+
+<section id="weight" class="page">
+  <div class="section-title"><div class="eyebrow">FREMSKRIDT OVER TID</div><h2>Vægt</h2><p>Registrér vægt og eventuelt taljemål under ens forhold.</p></div>
+  <article class="panel"><form id="weightForm">
+    <label>Dato<input name="date" type="date" required></label>
+    <div class="two"><label>Vægt (kg)<input name="kg" type="number" step="0.1" min="0" required></label><label>Talje (cm)<input name="waist" type="number" step="0.5" min="0"></label></div>
+    <label>Kommentar<input name="notes" placeholder="Valgfrit"></label>
+    <button class="primary">Gem vægt</button>
+  </form></article>
+  <article class="panel"><div class="panel-head"><h3>Vægtudvikling</h3><span class="tag" id="weightChange">–</span></div><div id="weightChart" class="chart"></div><div id="weightList" class="records"></div></article>
+</section>
+</main>
+<footer>ATHLETE · Bygget til dine mål · Data gemmes på din enhed</footer>
+<script src="app.js"></script>
+</body></html>
