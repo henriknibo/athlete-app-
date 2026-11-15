@@ -73,3 +73,17 @@ input,select,textarea{background:#101417;border-color:#303a42}
 /* Ugeplan for kost – syv dage og fem måltider pr. dag */
 .meal-week-nav{display:flex;gap:8px;margin:12px 0}.meal-week-nav button{flex:1;background:#101417;border:1px solid #303a42;color:#eaf0f2;border-radius:10px;padding:10px;font-weight:700;font-size:12px}
 .meal-week-plan{display:grid;gap:9px}.meal-day-card{background:#0e1316;border:1px solid #2b3338;border-radius:14px;overflow:hidden}.meal-day-card[open]{border-color:#52633a}.meal-day-card summary{list-style:none;display:flex;justify-content:space-between;align-items:center;padding:14px;cursor:pointer}.meal-day-card summary::-webkit-details-marker{display:none}.meal-day-card summary b{display:block;text-transform:capitalize;font-size:14px}.meal-day-card summary small{display:block;color:#929aa1;font-size:11px;margin-top:4px}.meal-day-progress{color:#a5f22d;font-size:22px;font-weight:800}.meal-slots{padding:0 12px 12px;display:grid;gap:8px}.meal-slot{display:grid;grid-template-columns:105px minmax(0,1fr);gap:8px;align-items:center;border-top:1px solid #252d32;padding-top:8px}.meal-slot-check{display:flex;align-items:center;gap:7px;font-size:11px;line-height:1.2}.meal-slot-check input{width:18px;height:18px;min-height:18px;accent-color:#a5f22d}.meal-slot-input{min-height:38px;padding:8px;font-size:12px}
+
+/* Styrkeprogram: samme lodrette, udfoldelige ugevisning som kostplanen */
+.workout-days{display:grid;grid-template-columns:1fr;gap:9px;margin:14px 0}
+.strength-day-card{background:#0e1316;border:1px solid #2b3338;border-radius:14px;overflow:hidden}
+.strength-day-card[open]{border-color:#52633a}
+.strength-day-card>summary{list-style:none;display:flex;justify-content:space-between;align-items:center;padding:14px;cursor:pointer}
+.strength-day-card>summary::-webkit-details-marker{display:none}
+.strength-day-card>summary b{display:block;font-size:14px}
+.strength-day-card>summary small{display:block;color:#929aa1;font-size:11px;margin-top:4px}
+.strength-day-arrow{color:#a5f22d;font-size:22px;font-weight:800;transition:transform .2s}
+.strength-day-card[open] .strength-day-arrow{transform:rotate(90deg)}
+.strength-day-content{padding:0 12px 12px}
+.strength-exercises{display:grid;gap:9px}
+.strength-day-content>.hint{margin:0 0 12px}

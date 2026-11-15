@@ -29,34 +29,43 @@ let selectedCycle=Math.max(1,Math.min(4,Number(db.strength[0]?.cycle||1)));
 function cycleNumber(){return selectedCycle}
 function setsForCycle(){return ({1:2,2:3,3:4,4:2})[cycleNumber()]}
 function lastExercise(name){return db.strength.find(x=>(x.exercise||'').toLowerCase()===name.toLowerCase())}
+function workoutDayMarkup(d,i,count){
+ const isToday=i===(new Date().getDay()+6)%7;
+ const subtitle=d.type==='strength'?`${d.items.length} øvelser · ${count} sæt pr. øvelse`:d.type==='cycling'?'Cykelpas':'Restitution';
+ let content='';
+ if(d.type==='cycling') content='<p class="hint">Cykeltræning registreres under fanen Cykling med distance, tid, watt og puls.</p><button class="primary" type="button" data-open-cycling>Åbn cykellog</button>';
+ else if(d.type==='rest') content='<p class="hint">Restitution: søvn, gåture og let mobilitet. Ingen planlagt træning.</p>';
+ else {
+  content='<div class="strength-exercises">';
+  d.items.forEach(([name,range],j)=>{
+   const last=lastExercise(name),kg=last?.kg??'',reps=last?.reps??Number((name==='Plank'?'30':range.split('–')[0]));
+   content+=`<div class="exercise-card" data-exercise-card="${j}"><div class="exercise-title"><div><strong>${esc(name)}</strong><small>Mål: ${esc(range)} gentagelser</small></div><span class="muted">${last?`Sidst ${esc(last.kg)} kg`:'Ny øvelse'}</span></div><div class="set-table">`;
+   for(let k=0;k<count;k++) content+=`<div class="set-row"><span class="set-num">${k+1}</span><label>Reps<input type="number" min="1" max="200" inputmode="numeric" data-reps="${j}" value="${esc(reps)}"></label><label>Kg<input type="number" min="0" step="0.5" inputmode="decimal" data-kg="${j}" value="${esc(kg)}" placeholder="kg"></label><input type="checkbox" aria-label="Sæt ${k+1} gennemført" data-done="${j}" data-set="${k}"></div>`;
+   content+=`</div><div class="exercise-progress"><span>Gennemførte sæt</span><b data-progress="${j}">0 / ${count}</b></div></div>`;
+  });
+  content+='</div><div class="workout-actions"><button class="workout-complete" type="button" data-save-day="'+i+'">Gem træningspas</button><p class="hint">Kun afkrydsede sæt gemmes i din historik.</p></div>';
+ }
+ return `<details class="strength-day-card" ${isToday?'open':''}><summary><span><b>${d.label}: ${esc(d.day)}</b><small>${subtitle}</small></span><span class="strength-day-arrow">›</span></summary><div class="strength-day-content">${content}</div></details>`;
+}
 function renderProgram(){
- const count=setsForCycle(),cycle=cycleNumber();
- const cycleSelect=document.getElementById('programCycleSelect');if(cycleSelect)cycleSelect.value=String(cycle);
- const home=document.getElementById('homeProgram');
- if(home)home.innerHTML=workoutPlan.map((d,i)=>`<button class="home-day ${i===(new Date().getDay()+6)%7?'today':''}" data-plan-day="${i}"><strong>${d.label}: ${esc(d.day)}</strong><small>${d.type==='strength'?`${d.items.length} øvelser · ${count} sæt pr. øvelse`:d.type==='cycling'?'Cykeltræning':'Restitution'}</small><em>${d.type==='strength'?'Åbn styrkepas →':d.type==='cycling'?'Log cykeltur →':'Hviledag'}</em></button>`).join('');
+ const count=setsForCycle();
+ const cycleSelect=document.getElementById('programCycleSelect');if(cycleSelect)cycleSelect.value=String(cycleNumber());
  const days=document.getElementById('workoutDays');
- if(days)days.innerHTML=workoutPlan.map((d,i)=>`<button class="workout-day-btn ${i===activeWorkoutIndex?'active':''}" data-workout-day="${i}"><strong>${d.label} · ${esc(d.day)}</strong><small>${d.type==='strength'?`${d.items.length} øvelser`:d.type==='cycling'?'Cykelpas':'Restitution'}</small></button>`).join('');
- const area=document.getElementById('activeWorkout');if(!area)return;
- const d=workoutPlan[activeWorkoutIndex];
- if(d.type==='cycling'){area.innerHTML=`<div class="workout-heading"><h3>${d.label}: Cykling</h3></div><p class="hint">Dagens cykelpas registreres under Cykling med distance, tid, watt og puls.</p><button class="primary" type="button" data-open-cycling>Åbn cykellog</button>`;return}
- if(d.type==='rest'){area.innerHTML=`<div class="workout-heading"><h3>Søndag: Hvile / restitution</h3></div><p class="hint">Restitution: søvn, gåture og let mobilitet. Ingen planlagt styrketræning.</p>`;return}
- area.innerHTML=`<div class="workout-heading"><h3>${d.label}: ${esc(d.day)}</h3><span class="tag">${count} sæt pr. øvelse</span></div>`+d.items.map((name,j)=>{
-  const last=lastExercise(name),kg=last?.kg??'',reps=last?.reps??Number((name==='Plank'?'30':d.items[j][1].split('–')[0]));
-  return `<div class="exercise-card" data-exercise-card="${j}"><div class="exercise-title"><div><strong>${esc(name)}</strong><small>Mål: ${esc(d.items[j][1])} gentagelser</small></div><span class="muted">${last?`Sidst ${esc(last.kg)} kg`:'Ny øvelse'}</span></div><div class="set-table">${Array.from({length:count},(_,k)=>`<div class="set-row"><span class="set-num">${k+1}</span><label>Reps<input type="number" min="1" max="200" inputmode="numeric" data-reps="${j}" value="${esc(reps)}"></label><label>Kg<input type="number" min="0" step="0.5" inputmode="decimal" data-kg="${j}" value="${esc(kg)}" placeholder="kg"></label><input type="checkbox" aria-label="Sæt ${k+1} gennemført" data-done="${j}" data-set="${k}"></div>`).join('')}</div><div class="exercise-progress"><span>Gennemførte sæt</span><b data-progress="${j}">0 / ${count}</b></div></div>`;
- }).join('')+`<div class="workout-actions"><button class="workout-complete" type="button" id="saveWorkoutSession">Gem træningspas</button><p class="hint">Kun afkrydsede sæt gemmes i din historik. Tidligere registreringer bevares.</p></div>`;
+ if(days)days.innerHTML=workoutPlan.map((d,i)=>workoutDayMarkup(d,i,count)).join('');
+ const area=document.getElementById('activeWorkout');if(area)area.innerHTML='';
 }
 document.getElementById('programCycleSelect')?.addEventListener('change',e=>{selectedCycle=Number(e.target.value)||1;renderProgram()});
 document.addEventListener('click',e=>{
  const home=e.target.closest('[data-plan-day]');if(home){const i=Number(home.dataset.planDay);activeWorkoutIndex=i;if(workoutPlan[i].type==='cycling'){openPage('cycling')}else{openPage('strength');renderProgram()}return}
- const day=e.target.closest('[data-workout-day]');if(day){activeWorkoutIndex=Number(day.dataset.workoutDay);renderProgram();return}
  if(e.target.closest('[data-open-cycling]')){openPage('cycling');return}
- if(e.target.closest('#saveWorkoutSession')){saveWorkoutSession();return}
+ const saveDay=e.target.closest('[data-save-day]');if(saveDay){saveWorkoutSession(Number(saveDay.dataset.saveDay));return}
 });
 document.addEventListener('change',e=>{const cb=e.target.closest('[data-done]');if(cb){const j=cb.dataset.done,card=cb.closest('.exercise-card'),n=card.querySelectorAll(`[data-done="${j}"]:checked`).length,total=card.querySelectorAll(`[data-done="${j}"]`).length;card.querySelector(`[data-progress="${j}"]`).textContent=`${n} / ${total}`;}});
-function saveWorkoutSession(){
- const d=workoutPlan[activeWorkoutIndex];if(d.type!=='strength')return;
+function saveWorkoutSession(dayIndex){
+ const d=workoutPlan[dayIndex];if(d.type!=='strength')return;
  const date=today(),cycle=cycleNumber(),count=setsForCycle();let saved=0;
- document.querySelectorAll('#activeWorkout .exercise-card').forEach((card,j)=>{
+ const dayCard=[...document.querySelectorAll('.strength-day-card')][dayIndex];
+ dayCard?.querySelectorAll('.exercise-card').forEach((card,j)=>{
   const name=d.items[j][0],rows=[...card.querySelectorAll('.set-row')],details=[];
   rows.forEach(row=>{if(row.querySelector('[data-done]').checked){details.push({reps:Number(row.querySelector('[data-reps]').value)||0,kg:Number(row.querySelector('[data-kg]').value)||0});}});
   if(details.length){const valid=details.filter(x=>x.reps>0);if(!valid.length)return;db.strength.unshift({id:crypto.randomUUID(),date,cycle,day:d.day,exercise:name,sets:valid.length,kg:valid.reduce((a,x)=>a+x.kg,0)/valid.length,reps:valid[0].reps,setsDetail:valid,notes:'Registreret fra træningsprogram'});saved++;}
