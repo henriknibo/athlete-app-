@@ -51,3 +51,25 @@ input,select,textarea{background:#101417;border-color:#303a42}
 .primary{background:#a5f22d;color:#11170a}
 .tab.active{background:#a5f22d;border-color:#a5f22d;color:#11170a}
 @media(max-width:420px){.metric-trio b{font-size:22px}.today-card h2{font-size:21px}.week-strip{gap:3px}.week-strip button span{height:44px;border-radius:12px}}
+
+/* Program og træningssessioner */
+.program-panel{background:linear-gradient(145deg,#171d20,#111518)}
+.home-program{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:14px}
+.home-day{border:1px solid #2b3338;background:#0e1316;border-radius:14px;padding:12px;text-align:left;color:var(--text);min-width:0}
+.home-day strong{display:block;font-size:13px;margin-bottom:5px}.home-day small{display:block;color:#929aa1;font-size:11px}.home-day em{display:block;color:#a5f22d;font-style:normal;font-size:11px;font-weight:800;margin-top:8px}
+.home-day.today{border-color:#a5f22d;box-shadow:inset 0 0 0 1px #a5f22d}
+.workout-panel{padding:16px}.workout-days{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:14px 0}
+.workout-day-btn{background:#0e1316;border:1px solid #30383d;border-radius:13px;color:#e9eef0;padding:12px;text-align:left;min-height:66px}
+.workout-day-btn strong{display:block;font-size:13px}.workout-day-btn small{display:block;color:#929aa1;margin-top:5px}.workout-day-btn.active{border-color:#a5f22d;background:#1b2417}
+.workout-heading{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:18px 0 12px}.workout-heading h3{margin:0}.exercise-card{border:1px solid #30383d;border-radius:15px;padding:13px;margin:10px 0;background:#0d1215}
+.exercise-title{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.exercise-title strong{font-size:14px}.exercise-title small{display:block;color:#929aa1;margin-top:4px;font-size:11px}
+.set-table{display:grid;gap:7px;margin-top:12px}.set-row{display:grid;grid-template-columns:28px minmax(0,1fr) minmax(0,1fr) 28px;gap:7px;align-items:center}.set-num{background:#20282d;border-radius:9px;text-align:center;padding:8px 0;font-weight:800;font-size:12px}.set-row label{font-size:10px;color:#929aa1;gap:3px}.set-row input[type=number]{min-height:38px;padding:7px;font-size:13px}.set-row input[type=checkbox]{width:22px;height:22px;min-height:22px;accent-color:#a5f22d;justify-self:end}
+.exercise-progress{display:flex;justify-content:space-between;color:#929aa1;font-size:11px;margin-top:9px}.exercise-progress b{color:#a5f22d}
+.workout-actions{display:grid;gap:8px;margin-top:14px}.workout-actions button{width:100%}.workout-complete{background:#a5f22d;color:#11170a;border:0;border-radius:12px;padding:14px;font-weight:900;font-size:15px}
+.manual-log-panel summary{color:#cbd4d9;font-weight:700;cursor:pointer}.manual-log-panel details[open] summary{margin-bottom:14px}
+@media(max-width:420px){.home-program,.workout-days{grid-template-columns:1fr 1fr}.set-row{grid-template-columns:25px minmax(0,1fr) minmax(0,1fr) 25px;gap:5px}.set-row input[type=number]{padding:6px}}
+.cycle-picker{display:grid;gap:5px;max-width:145px;font-size:10px;color:#929aa1}.cycle-picker select{min-height:36px;padding:7px;font-size:12px;border-radius:9px}
+
+/* Ugeplan for kost – syv dage og fem måltider pr. dag */
+.meal-week-nav{display:flex;gap:8px;margin:12px 0}.meal-week-nav button{flex:1;background:#101417;border:1px solid #303a42;color:#eaf0f2;border-radius:10px;padding:10px;font-weight:700;font-size:12px}
+.meal-week-plan{display:grid;gap:9px}.meal-day-card{background:#0e1316;border:1px solid #2b3338;border-radius:14px;overflow:hidden}.meal-day-card[open]{border-color:#52633a}.meal-day-card summary{list-style:none;display:flex;justify-content:space-between;align-items:center;padding:14px;cursor:pointer}.meal-day-card summary::-webkit-details-marker{display:none}.meal-day-card summary b{display:block;text-transform:capitalize;font-size:14px}.meal-day-card summary small{display:block;color:#929aa1;font-size:11px;margin-top:4px}.meal-day-progress{color:#a5f22d;font-size:22px;font-weight:800}.meal-slots{padding:0 12px 12px;display:grid;gap:8px}.meal-slot{display:grid;grid-template-columns:105px minmax(0,1fr);gap:8px;align-items:center;border-top:1px solid #252d32;padding-top:8px}.meal-slot-check{display:flex;align-items:center;gap:7px;font-size:11px;line-height:1.2}.meal-slot-check input{width:18px;height:18px;min-height:18px;accent-color:#a5f22d}.meal-slot-input{min-height:38px;padding:8px;font-size:12px}

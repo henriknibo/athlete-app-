@@ -1,25 +1,16 @@
-ATHLETE – gratis PWA-pakke
-===========================
+ATHLETE – opdateret træningsprogram
 
-Indhold:
-- index.html, style.css, app.js
-- manifest.webmanifest og sw.js (PWA/offline-støtte)
+Indeholder:
+- Ugeprogram med alle 7 dage
+- Fire styrkepas baseret på den nuværende ugeplan
+- Sætvis registrering med reps, kg og afkrydsning
+- Automatisk forslag til senest brugte vægt pr. øvelse
+- 4-ugers cyklus: 2, 3, 4 og 2 sæt
+- Cykling, kost, vægt, historik og backup
+- ATHLETE-logo og app-ikoner
+
+Opdatering:
+Upload alle filerne i denne mappe til roden af GitHub-repositoryet og vælg at erstatte eksisterende filer. Behold samme repository og GitHub Pages-indstillinger.
 
 Vigtigt:
-- Appen gemmer data lokalt i browserens localStorage på den aktuelle enhed.
-- Den synkroniserer IKKE automatisk mellem telefon/computer.
-- Brug eksportknappen øverst til at hente athlete-backup.json. Gem backup et sikkert sted.
-- Hvis browserdata/site-data slettes, kan lokale registreringer gå tabt.
-- Kalorie- og proteinmål er foreløbige og kan ændres.
-
-Sådan får du en gratis webadresse:
-1. Opret en gratis konto på GitHub.
-2. Opret et nyt repository, fx "athlete-app".
-3. Upload alle fem filer fra denne mappe til roden af repository.
-4. Gå til Settings > Pages.
-5. Under Build and deployment vælg "Deploy from a branch", branch "main", folder "/ (root)", og gem.
-6. Vent på at GitHub Pages viser en offentlig https-adresse.
-7. Åbn adressen i Safari på iPhone.
-8. Tryk Del > Føj til hjemmeskærm > Føj til.
-
-Hvis du ønsker, kan jeg guide dig trin for trin, mens du gør det.
+Appens registreringer gemmes lokalt i browseren på enheden. Denne version bruger fortsat samme lokale datanøgle (athlete-v1), så eksisterende registreringer bevares ved opdatering på samme enhed/browser. Tag en backup før opdatering for en sikkerheds skyld.

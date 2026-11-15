@@ -1,5 +1,5 @@
 const KEY="athlete-v1";
-const blank={strength:[],cycling:[],nutrition:[],weight:[],goals:{start:90,target:82,calories:2300,protein:180}};
+const blank={strength:[],cycling:[],nutrition:[],nutritionPlan:{},weight:[],goals:{start:90,target:82,calories:2300,protein:180}};
 let db=load();
 function load(){try{return {...blank,...JSON.parse(localStorage.getItem(KEY)||"{}")}}catch(e){return structuredClone(blank)}}
 function save(){localStorage.setItem(KEY,JSON.stringify(db));render()}
@@ -7,7 +7,7 @@ function today(){return new Date().toISOString().slice(0,10)}
 document.querySelectorAll('input[type="date"]').forEach(x=>x.value=today());
 document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.tab,.page').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.getElementById(b.dataset.page).classList.add('active');window.scrollTo(0,0)}));
 function openPage(page){document.querySelectorAll('.tab,.page').forEach(x=>x.classList.remove('active'));document.querySelector(`.tab[data-page="${page}"]`)?.classList.add('active');document.getElementById(page)?.classList.add('active');window.scrollTo(0,0)}
-document.querySelectorAll('[data-open]').forEach(b=>b.addEventListener('click',()=>{if(b.dataset.weekday){const day=document.querySelector('#strengthForm [name="day"]');if(day)day.value=b.dataset.weekday;}openPage(b.dataset.open)}));
+document.querySelectorAll('[data-open]').forEach(b=>b.addEventListener('click',()=>{if(b.dataset.weekday){const day=document.querySelector('#strengthForm [name="day"]');if(day)day.value=b.dataset.weekday;const ix=workoutPlan.findIndex(x=>x.day===b.dataset.weekday);if(ix>=0){activeWorkoutIndex=ix;renderProgram();}}openPage(b.dataset.open)}));
 document.querySelectorAll('[data-rest]').forEach(b=>b.addEventListener('click',()=>alert('Søndag er din restitutionsdag. Husk rolig bevægelse og restitution.')));
 function formData(form){return Object.fromEntries(new FormData(form).entries())}
 function add(form,key){form.addEventListener('submit',e=>{e.preventDefault();let d=formData(form);d.id=crypto.randomUUID();db[key].unshift(d);form.reset();form.querySelector('[name=date]').value=today();save();})}
@@ -15,7 +15,84 @@ add(document.getElementById('strengthForm'),'strength');add(document.getElementB
 function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function list(id,arr,title,sub){const el=document.getElementById(id);el.innerHTML=arr.length?arr.slice(0,30).map(x=>`<div class="record"><button data-del="${x.id}" data-kind="${id}">Slet</button><strong>${esc(title(x))}</strong><small>${esc(sub(x))}</small></div>`).join(''):'<p class="muted">Ingen registreringer endnu.</p>'}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-del]');if(!b)return;const key={strengthList:'strength',cyclingList:'cycling',nutritionList:'nutrition',weightList:'weight'}[b.dataset.kind];if(confirm('Vil du slette denne registrering?')){db[key]=db[key].filter(x=>x.id!==b.dataset.del);save()}});
+const workoutPlan=[
+ {day:'Bryst + triceps',label:'Mandag',short:'MAN',type:'strength',items:[['Dumbbell Bench Press','8–12'],['Dumbbell Fly','10–15'],['Incline Chest Press','8–12'],['Cable Triceps Extension','10–15'],['Triceps Pushdown','10–15']]},
+ {day:'Ryg + biceps',label:'Tirsdag',short:'TIR',type:'strength',items:[['Lat Pulldown','8–12'],['Seated Cable Row','8–12'],['Plate Loaded Machine Row','10–15'],['EZ Bar Bicep Curl','8–12'],['Hammer Curl','10–12']]},
+ {day:'Cykling',label:'Onsdag',short:'ONS',type:'cycling',items:[]},
+ {day:'Skulder + mave',label:'Torsdag',short:'TOR',type:'strength',items:[['Shoulder Press','8–12'],['Lateral Raise','10–15'],['Reverse Fly','10–15'],['Cable Crunch','12–15'],['Plank','30–45 sek.']]},
+ {day:'Ben',label:'Fredag',short:'FRE',type:'strength',items:[['Leg Press','8–12'],['Leg Curl','10–15'],['Leg Extension','10–15'],['Calf Raise','12–15'],['Goblet Squat','10–12']]},
+ {day:'Cykling',label:'Lørdag',short:'LØR',type:'cycling',items:[]},
+ {day:'Hvile',label:'Søndag',short:'SØN',type:'rest',items:[]}
+];
+let activeWorkoutIndex=(new Date().getDay()+6)%7;
+let selectedCycle=Math.max(1,Math.min(4,Number(db.strength[0]?.cycle||1)));
+function cycleNumber(){return selectedCycle}
+function setsForCycle(){return ({1:2,2:3,3:4,4:2})[cycleNumber()]}
+function lastExercise(name){return db.strength.find(x=>(x.exercise||'').toLowerCase()===name.toLowerCase())}
+function renderProgram(){
+ const count=setsForCycle(),cycle=cycleNumber();
+ const cycleSelect=document.getElementById('programCycleSelect');if(cycleSelect)cycleSelect.value=String(cycle);
+ const home=document.getElementById('homeProgram');
+ if(home)home.innerHTML=workoutPlan.map((d,i)=>`<button class="home-day ${i===(new Date().getDay()+6)%7?'today':''}" data-plan-day="${i}"><strong>${d.label}: ${esc(d.day)}</strong><small>${d.type==='strength'?`${d.items.length} øvelser · ${count} sæt pr. øvelse`:d.type==='cycling'?'Cykeltræning':'Restitution'}</small><em>${d.type==='strength'?'Åbn styrkepas →':d.type==='cycling'?'Log cykeltur →':'Hviledag'}</em></button>`).join('');
+ const days=document.getElementById('workoutDays');
+ if(days)days.innerHTML=workoutPlan.map((d,i)=>`<button class="workout-day-btn ${i===activeWorkoutIndex?'active':''}" data-workout-day="${i}"><strong>${d.label} · ${esc(d.day)}</strong><small>${d.type==='strength'?`${d.items.length} øvelser`:d.type==='cycling'?'Cykelpas':'Restitution'}</small></button>`).join('');
+ const area=document.getElementById('activeWorkout');if(!area)return;
+ const d=workoutPlan[activeWorkoutIndex];
+ if(d.type==='cycling'){area.innerHTML=`<div class="workout-heading"><h3>${d.label}: Cykling</h3></div><p class="hint">Dagens cykelpas registreres under Cykling med distance, tid, watt og puls.</p><button class="primary" type="button" data-open-cycling>Åbn cykellog</button>`;return}
+ if(d.type==='rest'){area.innerHTML=`<div class="workout-heading"><h3>Søndag: Hvile / restitution</h3></div><p class="hint">Restitution: søvn, gåture og let mobilitet. Ingen planlagt styrketræning.</p>`;return}
+ area.innerHTML=`<div class="workout-heading"><h3>${d.label}: ${esc(d.day)}</h3><span class="tag">${count} sæt pr. øvelse</span></div>`+d.items.map((name,j)=>{
+  const last=lastExercise(name),kg=last?.kg??'',reps=last?.reps??Number((name==='Plank'?'30':d.items[j][1].split('–')[0]));
+  return `<div class="exercise-card" data-exercise-card="${j}"><div class="exercise-title"><div><strong>${esc(name)}</strong><small>Mål: ${esc(d.items[j][1])} gentagelser</small></div><span class="muted">${last?`Sidst ${esc(last.kg)} kg`:'Ny øvelse'}</span></div><div class="set-table">${Array.from({length:count},(_,k)=>`<div class="set-row"><span class="set-num">${k+1}</span><label>Reps<input type="number" min="1" max="200" inputmode="numeric" data-reps="${j}" value="${esc(reps)}"></label><label>Kg<input type="number" min="0" step="0.5" inputmode="decimal" data-kg="${j}" value="${esc(kg)}" placeholder="kg"></label><input type="checkbox" aria-label="Sæt ${k+1} gennemført" data-done="${j}" data-set="${k}"></div>`).join('')}</div><div class="exercise-progress"><span>Gennemførte sæt</span><b data-progress="${j}">0 / ${count}</b></div></div>`;
+ }).join('')+`<div class="workout-actions"><button class="workout-complete" type="button" id="saveWorkoutSession">Gem træningspas</button><p class="hint">Kun afkrydsede sæt gemmes i din historik. Tidligere registreringer bevares.</p></div>`;
+}
+document.getElementById('programCycleSelect')?.addEventListener('change',e=>{selectedCycle=Number(e.target.value)||1;renderProgram()});
+document.addEventListener('click',e=>{
+ const home=e.target.closest('[data-plan-day]');if(home){const i=Number(home.dataset.planDay);activeWorkoutIndex=i;if(workoutPlan[i].type==='cycling'){openPage('cycling')}else{openPage('strength');renderProgram()}return}
+ const day=e.target.closest('[data-workout-day]');if(day){activeWorkoutIndex=Number(day.dataset.workoutDay);renderProgram();return}
+ if(e.target.closest('[data-open-cycling]')){openPage('cycling');return}
+ if(e.target.closest('#saveWorkoutSession')){saveWorkoutSession();return}
+});
+document.addEventListener('change',e=>{const cb=e.target.closest('[data-done]');if(cb){const j=cb.dataset.done,card=cb.closest('.exercise-card'),n=card.querySelectorAll(`[data-done="${j}"]:checked`).length,total=card.querySelectorAll(`[data-done="${j}"]`).length;card.querySelector(`[data-progress="${j}"]`).textContent=`${n} / ${total}`;}});
+function saveWorkoutSession(){
+ const d=workoutPlan[activeWorkoutIndex];if(d.type!=='strength')return;
+ const date=today(),cycle=cycleNumber(),count=setsForCycle();let saved=0;
+ document.querySelectorAll('#activeWorkout .exercise-card').forEach((card,j)=>{
+  const name=d.items[j][0],rows=[...card.querySelectorAll('.set-row')],details=[];
+  rows.forEach(row=>{if(row.querySelector('[data-done]').checked){details.push({reps:Number(row.querySelector('[data-reps]').value)||0,kg:Number(row.querySelector('[data-kg]').value)||0});}});
+  if(details.length){const valid=details.filter(x=>x.reps>0);if(!valid.length)return;db.strength.unshift({id:crypto.randomUUID(),date,cycle,day:d.day,exercise:name,sets:valid.length,kg:valid.reduce((a,x)=>a+x.kg,0)/valid.length,reps:valid[0].reps,setsDetail:valid,notes:'Registreret fra træningsprogram'});saved++;}
+ });
+ if(!saved){alert('Markér mindst ét gennemført sæt, før du gemmer.');return;}
+ save();renderProgram();alert(`${saved} øvelse(r) gemt i din træningshistorik.`);
+}
+const mealNames=['Morgenmad','Snack 1','Frokost','Snack 2','Aftensmad'];
+let mealWeekOffset=0;
+function dateAtWeek(offset,day){const now=new Date();now.setHours(12,0,0,0);const monday=(now.getDay()+6)%7;now.setDate(now.getDate()-monday+offset*7+day);return now.toISOString().slice(0,10)}
+function dateLabel(iso){return new Date(iso+'T12:00:00').toLocaleDateString('da-DK',{weekday:'long',day:'numeric',month:'short'})}
+function renderMealPlan(){
+ const root=document.getElementById('mealWeekPlan');if(!root)return;
+ const start=dateAtWeek(mealWeekOffset,0),end=dateAtWeek(mealWeekOffset,6);
+ document.getElementById('mealWeekLabel').textContent=mealWeekOffset===0?'Denne uge':`${dateLabel(start)} – ${dateLabel(end)}`;
+ root.innerHTML=Array.from({length:7},(_,day)=>{
+  const date=dateAtWeek(mealWeekOffset,day),items=db.nutritionPlan[date]||{};
+  const completed=mealNames.filter((_,i)=>items[i]?.done).length;
+  return `<details class="meal-day-card" ${date===today()?'open':''}><summary><span><b>${dateLabel(date)}</b><small>${completed}/5 måltider</small></span><span class="meal-day-progress">${completed===5?'✓':'›'}</span></summary><div class="meal-slots">${mealNames.map((meal,i)=>{const item=items[i]||{};return `<div class="meal-slot"><label class="meal-slot-check"><input type="checkbox" data-meal-done="${date}" data-meal-index="${i}" ${item.done?'checked':''}><span>${meal}</span></label><input class="meal-slot-input" type="text" data-meal-text="${date}" data-meal-index="${i}" value="${esc(item.text||'')}" placeholder="Skriv ${meal.toLowerCase()} ind…"></div>`}).join('')}</div></details>`
+ }).join('');
+}
+document.getElementById('mealPrevWeek')?.addEventListener('click',()=>{mealWeekOffset--;renderMealPlan()});
+document.getElementById('mealNextWeek')?.addEventListener('click',()=>{mealWeekOffset++;renderMealPlan()});
+document.getElementById('mealThisWeek')?.addEventListener('click',()=>{mealWeekOffset=0;renderMealPlan()});
+document.addEventListener('change',e=>{
+ const field=e.target.closest('[data-meal-text],[data-meal-done]');if(!field)return;
+ const date=field.dataset.mealText||field.dataset.mealDone,index=Number(field.dataset.mealIndex);
+ db.nutritionPlan[date]??={};db.nutritionPlan[date][index]??={text:'',done:false};
+ if(field.hasAttribute('data-meal-text'))db.nutritionPlan[date][index].text=field.value;
+ else db.nutritionPlan[date][index].done=field.checked;
+ localStorage.setItem(KEY,JSON.stringify(db));
+ if(field.hasAttribute('data-meal-done'))renderMealPlan();
+});
+
 function render(){
+ renderMealPlan();
  const g=db.goals||blank.goals;
  document.getElementById('goalStart').value=g.start;document.getElementById('goalTarget').value=g.target;document.getElementById('goalCalories').value=g.calories;document.getElementById('goalProtein').value=g.protein;
  const w=db.weight[0];document.getElementById('homeWeight').textContent=w?Number(w.kg).toFixed(1):'–';
@@ -72,6 +149,7 @@ function render(){
  const sorted=[...db.weight].sort((a,b)=>a.date.localeCompare(b.date)).slice(-12),vals=sorted.map(x=>+x.kg),min=Math.min(...vals, g.target)-1,max=Math.max(...vals,g.start)+1;
  document.getElementById('weightChart').innerHTML=sorted.length?sorted.map(x=>{let h=Math.max(5,((+x.kg-min)/(max-min))*100);return `<div class="bar-wrap"><small>${(+x.kg).toFixed(1)}</small><div class="bar" style="height:${h}%"></div><small>${esc(x.date.slice(5))}</small></div>`}).join(''):'<p class="muted">Tilføj dine vejninger for at se grafen.</p>';
  const diff=sorted.length>1?(+sorted.at(-1).kg-(+sorted[0].kg)):'–';document.getElementById('weightChange').textContent=diff==='–'?'Ingen data':`${diff>0?'+':''}${diff.toFixed(1)} kg`;
+ renderProgram();
  const ex=document.querySelector('#strengthForm [name=exercise]');const last=db.strength.find(x=>x.exercise.toLowerCase()===ex.value.toLowerCase());document.getElementById('lastLift').textContent=last?`Sidst registreret: ${last.kg} kg · ${last.sets} sæt · ${last.reps} gentagelser (${last.date})`:'Seneste vægt og gentagelser vises her, når du vælger en øvelse, du har logget før.';
 }
 document.querySelector('#strengthForm [name=exercise]').addEventListener('input',render);

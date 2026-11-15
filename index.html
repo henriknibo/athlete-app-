@@ -31,6 +31,8 @@
     <div class="today-icon" id="todayIcon">🏋️</div>
   </article>
 
+  <article class="panel program-panel"><div class="panel-head"><h3>UGENS TRÆNINGSPROGRAM</h3><span class="tag">4 styrkepas</span></div><div id="homeProgram" class="home-program"></div></article>
+
   <article class="panel week-panel">
     <div class="panel-head"><h3>UGEN</h3><strong class="week-count" id="weekCount">0/6</strong></div>
     <div class="week-strip" id="weekStrip">
@@ -79,7 +81,14 @@
 
 <section id="strength" class="page">
   <div class="section-title"><div class="eyebrow">TRÆNINGSLOG</div><h2>Styrketræning</h2><p>Log vægt, sæt og gentagelser. Seneste tal vises som hjælp næste gang.</p></div>
-  <article class="panel">
+  <article class="panel workout-panel">
+    <div class="panel-head"><h3>DIT TRÆNINGSPROGRAM</h3><label class="cycle-picker">Styrkeuge<select id="programCycleSelect"><option value="1">Uge 1 · 2 sæt</option><option value="2">Uge 2 · 3 sæt</option><option value="3">Uge 3 · 4 sæt</option><option value="4">Uge 4 · 2 sæt</option></select></label></div>
+    <p class="hint">Vælg en træningsdag, registrér vægt og gentagelser for hvert sæt, og markér sættet, når det er gennemført. Dine seneste vægte foreslås automatisk.</p>
+    <div id="workoutDays" class="workout-days"></div>
+    <div id="activeWorkout" class="active-workout"></div>
+  </article>
+  <article class="panel manual-log-panel">
+    <details><summary>Manuel styrkelog (enkeltøvelse)</summary>
     <form id="strengthForm">
       <label>Dato<input name="date" type="date" required></label>
       <label>Uge i 4-ugers cyklus<select name="cycle"><option value="1">Uge 1 · 2 sæt</option><option value="2">Uge 2 · 3 sæt</option><option value="3">Uge 3 · 4 sæt</option><option value="4">Uge 4 · 2 sæt</option></select></label>
@@ -91,7 +100,7 @@
       <div id="lastLift" class="hint"></div>
       <label>Noter (valgfrit)<textarea name="notes" rows="2" placeholder="Fx god teknik, tung sidste serie…"></textarea></label>
       <button class="primary">Gem styrketræning</button>
-    </form>
+    </form></details>
   </article>
   <article class="panel"><h3>Historik</h3><div id="strengthList" class="records"></div></article>
 </section>
@@ -112,7 +121,13 @@
 </section>
 
 <section id="nutrition" class="page">
-  <div class="section-title"><div class="eyebrow">BRÆNDSTOF TIL KROPPEN</div><h2>Kostlog</h2><p>Følg kalorier og makroer. Målene kan ændres på startsiden.</p></div>
+  <div class="section-title"><div class="eyebrow">BRÆNDSTOF TIL KROPPEN</div><h2>Kostplan</h2><p>Planlæg alle ugens dage med 3 hovedmåltider og 2 mellemmåltider – og kryds af, når du har spist.</p></div>
+  <article class="panel meal-plan-panel">
+    <div class="panel-head"><h3>UGENS KOSTPLAN</h3><span class="tag" id="mealWeekLabel">Denne uge</span></div>
+    <div class="meal-week-nav"><button type="button" id="mealPrevWeek">‹ Forrige</button><button type="button" id="mealThisWeek">I dag</button><button type="button" id="mealNextWeek">Næste ›</button></div>
+    <div id="mealWeekPlan" class="meal-week-plan"></div>
+    <p class="hint">Skriv selv dine måltider ind. Planen gemmes på denne enhed. Afkrydsning betyder, at måltidet er gennemført.</p>
+  </article>
   <article class="panel"><div class="macro-grid"><div><small>Kalorier i dag</small><b id="todayCalories">0</b></div><div><small>Protein i dag</small><b id="todayProtein">0 g</b></div></div><p class="hint" id="nutritionTargets"></p></article>
   <article class="panel"><form id="nutritionForm">
     <label>Dato<input name="date" type="date" required></label>
